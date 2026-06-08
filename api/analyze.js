@@ -1,9 +1,20 @@
-const fallbackAnalysis = (company) => ({
+const getFallbackScore = (company) => {
+  const normalized = String(company || '').toUpperCase();
+  const hash = [...normalized].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+
+  return 68 + (hash % 24);
+};
+
+const fallbackAnalysis = (company) => {
+  const fitScore = getFallbackScore(company);
+  const decision = fitScore >= 86 ? 'BUY' : fitScore >= 74 ? 'HOLD' : 'AVOID';
+
+  return {
   company,
-  decision: 'HOLD',
-  fitScore: 84,
+  decision,
+  fitScore,
   summary:
-    '이 기업은 혁신성과 성장 스토리 측면에서 High Conviction Explorer 성향과 잘 맞습니다. 다만 기대감이 이미 가격에 반영되었을 수 있어 즉시 큰 비중으로 진입하기보다 근거와 가격 기준을 나누어 확인하는 접근이 더 적합합니다.',
+    `${company}은(는) 혁신성과 성장 스토리 측면에서 High Conviction Explorer 성향과 맞닿아 있습니다. 다만 기대감이 이미 가격에 반영되었을 수 있어 즉시 큰 비중으로 진입하기보다 근거와 가격 기준을 나누어 확인하는 접근이 더 적합합니다.`,
   fitReasons: [
     '새로운 산업과 기술 변화에 빠르게 반응하는 성향과 잘 맞습니다.',
     '높은 변동성을 견디며 장기 아이디어를 추적하는 투자 방식과 부합합니다.',
@@ -24,7 +35,8 @@ const fallbackAnalysis = (company) => ({
     '당신의 가장 큰 위험은 공포가 아니라 빠른 확신입니다. 매수 전 최대 비중, 손실 인정 기준, 추가 매수 조건을 숫자로 정하지 않았다면 아직 좋은 판단이 아니라 강한 끌림일 수 있습니다.',
   actionGuide:
     '관심 비중을 작게 시작하고 2~3회 분할 진입을 기본으로 두세요. 첫 매수 전 목표 비중, 실적 확인 지표, 손절 또는 재검토 기준을 먼저 적어두는 것을 권장합니다.',
-});
+  };
+};
 
 const normalizeAnalysis = (payload, company) => {
   const decision = ['BUY', 'HOLD', 'AVOID'].includes(payload?.decision)
